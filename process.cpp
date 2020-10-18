@@ -7,6 +7,11 @@
 #include <functional>
 #include <numeric>
 #include <tuple>
+#include <regex>
+#include<getopt.h>
+extern int optind,opterr,optopt;
+extern char *optargi;
+
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -49,15 +54,87 @@ vector<long> get_package_timediff (const vector<string>& package){
     return time_diff;
 }
 
-int main(){
+vector<string> split_by_delims(const string& str, const string& delims){
+    string patternstr=string("[^")+delims+"]*["+delims+"]";
+    cout<<"search pattern="<<patternstr<<endl;
+
+    regex pattern(patternstr);
+    vector<string> output;
+    smatch result;
+    string s = str;
+    int i = 0;
+    while (regex_search(s, result, pattern)){
+        if (result.ready()){
+            cout<<"index="<<i<<", result=["<<result[0]<<"]"<<endl;
+            string tmp = result[0];
+            char delim = *tmp.rbegin(); //or: tmp.back();
+            if (delims.find(delim) != string::npos){
+                tmp.erase(tmp.end()-1);
+            }
+            output.emplace_back(tmp);
+            s = result.suffix();
+            i++;
+        }
+    }
+    if (s!="")
+        output.emplace_back(s);
+    return output;
+}
+
+
+
+int main(int argc, char* argv[]){
+    int idx = 0;
+    int c = 0; //用于接收选项
+    /*循环处理参数*/
+    // "-f logfile -s "adfasdfa@adfasd@sdfasdf" -i "a" -d
+    static struct option long_options[] =
+    {
+        {"logfile",required_argument,NULL,'f'},
+        {"stringtags",required_argument,NULL,'s'},
+        {"seperator",required_argument,NULL,'i'},
+        {"debugmode",no_argument,NULL,'d'}
+    };
+
 
     bool strict_mode=false;
     string input_logfile="./logfile";
-    vector<string> tags;
-    tags.emplace_back("callback status : 0");
-    tags.emplace_back("稳定点达到，开始结算");
-    tags.emplace_back("上传中...");
-    tags.emplace_back("上传 成功");
+    string input_tagstrings="callback status : 0|稳定点达到，开始结算|上传中...|上传 成功";
+    string seperator="|";
+
+    while(EOF != (c = getopt_long(argc,argv,"f:s:i:d",long_options,&idx)))
+    {
+        switch(c)
+        {
+            case 'f':
+                printf("we get option -f，%s\n",optarg);
+                input_logfile=optarg;
+                break;
+            case 's':
+                printf("we get option -s，%s\n",optarg);
+                input_tagstrings=optarg;
+                break;
+            case 'i':
+                printf("we get option -i, %s\n",optarg);
+                seperator=optarg;
+                break;
+            case 'd':
+                printf("we get option -d\n");
+                debug = true;
+                break;
+            //表示选项不支持
+            case '?':
+                printf("unknow option:%c\n",optopt);
+                break;
+            default:
+                break;
+        }
+    }
+
+    vector<string> tags = split_by_delims(input_tagstrings, seperator);
+
+    cout<<"process tags:"<<endl;
+    for_each(tags.cbegin(), tags.cend(), [](const auto& s){cout<<"\t"<<s<<endl;});
 
     string intermediate_dir= "_intermediate";
     fs::path data_dir=fs::current_path()/=intermediate_dir;
