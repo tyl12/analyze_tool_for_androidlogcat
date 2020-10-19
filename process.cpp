@@ -103,6 +103,7 @@ int main(int argc, char* argv[]){
         {"logfile",required_argument,NULL,'f'},
         {"stringtags",required_argument,NULL,'s'},
         {"seperator",required_argument,NULL,'i'},
+        {"strict",no_argument,NULL,'r'},
         {"debugmode",no_argument,NULL,'d'}
     };
 
@@ -127,6 +128,10 @@ int main(int argc, char* argv[]){
             case 'i':
                 printf("we get option -i, %s\n",optarg);
                 seperator=optarg;
+                break;
+            case 'r':
+                printf("we get option -r\n");
+                strict_mode = true;
                 break;
             case 'd':
                 printf("we get option -d\n");
@@ -180,10 +185,19 @@ int main(int argc, char* argv[]){
         }
         if (line.find(tags[index]) != string::npos){//cache the matched sequence in package temporarily, to avoid any error happen in halfway
             package.emplace_back(line);
-            if (index == tags.size() -1 ){
+            if (index == tags.size() -1 ){ //re-cache the data to filter_apckages & filter_strings if one whole valid package is found
                 if (debug){
                     cout<<"RECORD below valid package:"<<endl;
-                    for_each(package.cbegin(), package.cend(), [ data_dir=data_dir](const string& s){cout<<s<<endl; });
+                    for_each(package.cbegin(), package.cend(), [](const string& s){cout<<s<<endl; });
+                    /*
+                    ofstream filter_file=ofstream(data_dir/"step0");
+                    for_each(package.cbegin(), package.cend(), [ data_dir=data_dir, filter_file=move(filter_file)](const string& s)mutable{
+                        cout<<s<<endl;
+                        filter_file<<s<<endl;
+                    });
+                    */
+
+
                 }
                 filter_packages.emplace_back(package);
                 filter_strings.insert(filter_strings.end(), make_move_iterator(package.begin()), make_move_iterator(package.end()));
