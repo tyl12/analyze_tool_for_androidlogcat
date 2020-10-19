@@ -225,7 +225,7 @@ int main(int argc, char* argv[]){
     //average
     vector<vector<long>> timediff_stage(tags.size()-1);
     for(const auto& package:timediff_packages){
-        for(int i=0;i<package.size();i++)
+        for(auto i=0UL;i<package.size();i++)
             timediff_stage[i].push_back(package[i]);
     }
     vector<long> timediff_stage_average;
@@ -239,7 +239,7 @@ int main(int argc, char* argv[]){
     printf("\n");
     for(const auto& package:timediff_packages){
         //printf("%-40s", " ");
-        for_each(package.cbegin(), package.cend(), [](const auto& v){ printf("%-40d ", v);});
+        for_each(package.cbegin(), package.cend(), [](const auto& v){ printf("%-40ld ", v);});
         printf("\n");
     }
 
@@ -247,18 +247,18 @@ int main(int argc, char* argv[]){
     printf("\n");
     printf("Min:\n");
     for (const auto& s:timediff_stage){
-        printf("%-40d ", *min_element(s.cbegin(), s.cend()));
+        printf("%-40ld ", *min_element(s.cbegin(), s.cend()));
     }
     printf("\n\n");
 
     printf("Max:\n");
     for (const auto& s:timediff_stage){
-        printf("%-40d ", *max_element(s.cbegin(), s.cend()));
+        printf("%-40ld ", *max_element(s.cbegin(), s.cend()));
     }
     printf("\n\n");
 
     printf("AVERAGE:\n");
-    for_each(timediff_stage_average.cbegin(), timediff_stage_average.cend(), [](const auto& v){ printf("%-40d ", v);});
+    for_each(timediff_stage_average.cbegin(), timediff_stage_average.cend(), [](const auto& v){ printf("%-40ld ", v);});
     printf("\n\n");
 
     cout<<"done"<<endl;
