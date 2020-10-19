@@ -15,7 +15,7 @@ extern char *optargi;
 using namespace std;
 namespace fs = std::filesystem;
 
-bool debug=true;
+bool debug=false;
 
 tuple<string, long> time_parser(const string& input){
     //10-15 11:40:06.025
