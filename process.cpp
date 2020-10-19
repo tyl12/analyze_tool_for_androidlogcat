@@ -19,6 +19,15 @@ bool debug=false;
 
 tuple<string, long> time_parser(const string& input){
     //10-15 11:40:06.025
+
+    auto timestr=input.substr(0,18);
+    int M,d,h,m;
+    float s;
+    sscanf(timestr.c_str(), "%d-%d %d:%d:%fZ", &M, &d, &h, &m, &s);
+    long timeval=d*24*60*60*1000 + h*60*60*1000 + m*60*1000 + s*1000;
+    return make_tuple(timestr, timeval);
+
+    /*
     auto timestr=input.substr(0,18);
     int month=stoi(input.substr(0,2));
     int day=stoi(input.substr(3,2));
@@ -30,6 +39,7 @@ tuple<string, long> time_parser(const string& input){
     //FIXME
     long timeval=day*24*60*60*1000 + hour*60*60*1000 + min*60*1000 + sec*1000 + millisec;
     return make_tuple(timestr, timeval);
+    */
 }
 
 vector<long> get_package_timediff (const vector<string>& package){
@@ -125,7 +135,7 @@ int main(int argc, char* argv[]){
             //表示选项不支持
             case '?':
                 printf("unknow option:%c\n",optopt);
-                break;
+                return -1;
             default:
                 break;
         }
