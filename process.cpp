@@ -165,6 +165,11 @@ int main(int argc, char* argv[]){
     //filter valid records, based on input tags, validate sequence as well
     vector<string> filter_strings;
     ifstream ifile(input_logfile);
+    if (!ifile){
+        cout<<"Fatal error: invalid input file: "<<input_logfile<<endl;
+        return -1;
+    }
+
     auto valid_line=[&](const string& line){
         for (const auto& tag:tags){
             if (line.find(tag)!=string::npos){
