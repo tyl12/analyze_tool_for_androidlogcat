@@ -18,15 +18,30 @@ namespace fs = std::filesystem;
 bool debug=false;
 
 tuple<string, long> time_parser(const string& input){
-    //10-15 11:40:06.025
-
-    auto timestr=input.substr(0,18);
-    int M,d,h,m;
-    float s;
-    sscanf(timestr.c_str(), "%d-%d %d:%d:%fZ", &M, &d, &h, &m, &s);
-    long timeval=d*24*60*60*1000 + h*60*60*1000 + m*60*1000 + s*1000;
-    return make_tuple(timestr, timeval);
-
+    /*
+    */
+    if (input[4] == '-' && input[7] == '-' && input[10] == ' '){
+        //2020-10-21 11:08:06.622
+        auto timestr=input.substr(0,23);
+        int y,M,d,h,m;
+        float s;
+        sscanf(timestr.c_str(), "%d-%d-%d %d:%d:%fZ", &y, &M, &d, &h, &m, &s);
+        long timeval=d*24*60*60*1000 + h*60*60*1000 + m*60*1000 + s*1000;
+        return make_tuple(timestr, timeval);
+    }
+    else if (input[2] == '-' && input[5] == ' '){
+        //10-15 11:40:06.025
+        auto timestr=input.substr(0,18);
+        int M,d,h,m;
+        float s;
+        sscanf(timestr.c_str(), "%d-%d %d:%d:%fZ", &M, &d, &h, &m, &s);
+        long timeval=d*24*60*60*1000 + h*60*60*1000 + m*60*1000 + s*1000;
+        return make_tuple(timestr, timeval);
+    }
+    else{
+        cout<<"Invalid format found." << input<<endl;
+        exit(-1);
+    }
     /*
     auto timestr=input.substr(0,18);
     int month=stoi(input.substr(0,2));
@@ -211,8 +226,11 @@ int main(int argc, char* argv[]){
             index = (index+1)%tags.size();
         }
         else{//something wrong
-            if (filter_strings.size() == 0)
+            if (filter_strings.size() == 0){
+                package.clear();
+                index = 0;
                 continue; //wait for first match
+            }
 
             if (strict_mode){
                 cout<<"ERROR to process file, some contents in wrong sequence found."<<endl;
