@@ -8,7 +8,9 @@
 #include <numeric>
 #include <tuple>
 #include <regex>
-#include<getopt.h>
+#include <getopt.h>
+#include "utils.h"
+
 extern int optind,opterr,optopt;
 extern char *optargi;
 
@@ -79,35 +81,6 @@ vector<long> get_package_timediff (const vector<string>& package){
     return time_diff;
 }
 
-vector<string> split_by_delims(const string& str, const string& delims){
-    string patternstr=string("[^")+delims+"]*["+delims+"]";
-    cout<<"search pattern="<<patternstr<<endl;
-
-    regex pattern(patternstr);
-    vector<string> output;
-    smatch result;
-    string s = str;
-    int i = 0;
-    while (regex_search(s, result, pattern)){
-        if (result.ready()){
-            cout<<"index="<<i<<", result=["<<result[0]<<"]"<<endl;
-            string tmp = result[0];
-            char delim = *tmp.rbegin(); //or: tmp.back();
-            if (delims.find(delim) != string::npos){
-                tmp.erase(tmp.end()-1);
-            }
-            output.emplace_back(tmp);
-            s = result.suffix();
-            i++;
-        }
-    }
-    if (s!="")
-        output.emplace_back(s);
-    return output;
-}
-
-
-
 int main(int argc, char* argv[]){
     int idx = 0;
     int c = 0; //用于接收选项
@@ -161,7 +134,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-    vector<string> tags = split_by_delims(input_tagstrings, seperator);
+    vector<string> tags = utils::split_by_delims(input_tagstrings, seperator);
 
     cout<<"process tags:"<<endl;
     for_each(tags.cbegin(), tags.cend(), [](const auto& s){cout<<"\t"<<s<<endl;});
